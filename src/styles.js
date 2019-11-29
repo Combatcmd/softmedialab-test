@@ -20,4 +20,11 @@ export default {
     right: 0,
     zIndex: 1,
   },
+  stickyHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  }
 };

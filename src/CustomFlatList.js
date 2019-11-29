@@ -7,20 +7,26 @@ export default class CustomFlatList extends React.PureComponent {
     super(props);
 
     this.viewabilityConfig = {
-      minimumViewTime: 1,
+      minimumViewTime: 2,
       itemVisiblePercentThreshold: 100,
     };
 
     this.state = {
-      stickyFooter: true,
+      stickyHeader: false,
+      stickyFooter: true
     };
   }
 
-  handleBottomStickyItem = info => {
-    console.log(info);
+  handleStickyItem = info => {
     const {viewableItems} = info;
-    const {stickyFooter} = this.state;
+    const {stickyFooter, stickyHeader} = this.state;
     const {stickyIndex} = this.props;
+
+    const _stickyHeader = viewableItems[0].index > stickyIndex
+
+    if (stickyHeader !== _stickyHeader) {
+      this.setState({ stickyHeader: _stickyHeader })
+    }
 
     const _stickyFooter =
       viewableItems[viewableItems.length - 1].index < stickyIndex;
@@ -40,7 +46,7 @@ export default class CustomFlatList extends React.PureComponent {
   };
 
   render() {
-    const {stickyFooter} = this.state;
+    const {stickyFooter, stickyHeader} = this.state;
     const {renderItem, data, stickyIndex, keyExtractor} = this.props;
 
     if (!data) {
@@ -52,13 +58,16 @@ export default class CustomFlatList extends React.PureComponent {
 
     return (
       <View style={styles.container}>
+        {stickyData && stickyHeader && (
+            <View style={styles.stickyHeader}>{renderItem(stickyData)}</View>
+          )}
         <FlatList
-          stickyHeaderIndices={[stickyIndex]}
           style={styles.list}
           data={data}
           renderItem={renderItem}
           getItemLayout={this.getItemLayout}
-          onViewableItemsChanged={this.handleBottomStickyItem}
+          viewabilityConfig={this.viewabilityConfig}
+          onViewableItemsChanged={this.handleStickyItem}
           initialNumToRender={5}
           removeClippedSubviews={true}
           keyExtractor={keyExtractor}
